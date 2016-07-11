@@ -42,7 +42,7 @@ struct star {
     float x;
     float y;
     float z;
-    size_t color;
+    size_t initial_color;
 };
 
 struct star stars[NUM_STARS];
@@ -58,8 +58,19 @@ static void init_star(struct star *star)
 
 
     /* [0, 255] */
-    star->color = (1.0f - ((float)rand() / RAND_MAX) * 0.75f) * 255.0f;
-    star->color = star->color > 255 ? 255 : star->color;
+    star->initial_color = (1.0f - ((float)rand() / RAND_MAX) * 0.75f) * 255.0f;
+    star->initial_color = star->initial_color > 255 ? 255
+                                                    : star->initial_color;
+}
+
+static size_t star_color(struct star *star)
+{
+    /* Make star more dim when far away. */
+    size_t color = (star->initial_color / 255.0f)
+                   * (1.0f - fabs(star->z / z_start)) * 255;
+    color = color > 255 ? 255 : color; /* [0, 255] */
+
+    return color;
 }
 
 static void plot_pixel(size_t x, size_t y, size_t color)
@@ -117,7 +128,7 @@ static void render_stars(void)
         else
         {
             /* Draw the new star. */
-            plot_pixel(x, y, stars[i].color);
+            plot_pixel(x, y, star_color(&stars[i]));
         }
     }
 }
