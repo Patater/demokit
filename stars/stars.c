@@ -22,7 +22,9 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-static const float star_speed = 0.005f;
+static const float star_speed = 0.025f;
+static const float z_start = -8.0f;
+static const float r_range = 100000.0f;
 
 #if CAP_SPEED
 static size_t speed = 30;
@@ -48,13 +50,15 @@ static void init_star(struct star *star)
 {
     /* Make a disc of stars. */
     const float t = ((float)rand() / RAND_MAX) * (2.0f * M_PI);
-    const float r = ((float)rand() / RAND_MAX);
-    star->x = r * cos(t);                 /* [-1.0, 1.0] */
-    star->y = r * sin(t);                 /* [-1.0, 1.0] */
-    star->z = ((float)rand() / RAND_MAX); /* [0.0, 1.0f] */
+    const float r = r_range * ((float)rand() / RAND_MAX);
+    star->x = r * cos(t);                 /* [-r_range, r_range] */
+    star->y = r * sin(t);                 /* [-r_range, r_range] */
+    star->z = z_start;
 
-    star->color = r * 255;
-    star->color = star->color > 255 ? 255 : star->color; /* [0, 255] */
+
+    /* [0, 255] */
+    star->color = (1.0f - ((float)rand() / RAND_MAX) * 0.75f) * 255.0f;
+    star->color = star->color > 255 ? 255 : star->color;
 }
 
 static void plot_pixel(size_t x, size_t y, size_t color)
@@ -76,10 +80,12 @@ static void render_stars(void)
     {
         size_t x;
         size_t y;
+        float widthf = width;
+        float heightf = height;
 
         /* Old position */
-        x = stars[i].x * stars[i].z * width + width / 2.0f - 1.0f;
-        y = stars[i].y * stars[i].z * height + height / 2.0f - 1.0f;
+        x = stars[i].x / stars[i].z + widthf / 2.0f;
+        y = stars[i].y / stars[i].z + heightf / 2.0f;
 
         /* If star is out of sight: */
         if (clip_pixel(x, y))
@@ -96,8 +102,8 @@ static void render_stars(void)
         stars[i].z += star_speed;
 
         /* New position */
-        x = stars[i].x * stars[i].z * width + width / 2.0f - 1.0f;
-        y = stars[i].y * stars[i].z * height + height / 2.0f - 1.0f;
+        x = stars[i].x / stars[i].z + widthf / 2.0f;
+        y = stars[i].y / stars[i].z + heightf / 2.0f;
 
         /* If star is out of sight: */
         if (clip_pixel(x, y))
