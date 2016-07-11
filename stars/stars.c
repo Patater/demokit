@@ -13,6 +13,7 @@
 #include <stdlib.h>
 
 #define NUM_STARS 1024
+#define ERASE_OLD_STARS 1
 #define CAP_SPEED 1
 #define WIDTH 320
 #define HEIGHT 240
@@ -96,7 +97,9 @@ static void render_stars(void)
         }
 
         /* Erase the previously drawn star. */
+#if ERASE_OLD_STARS
         plot_pixel(x, y, 0);
+#endif
 
         /* Move star closer. */
         stars[i].z += star_speed;
