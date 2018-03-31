@@ -10,6 +10,9 @@
 #include "firepal.h"
 #include <SDL2/SDL.h>
 #include <stdlib.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 
 #define CAP_SPEED 1
@@ -27,8 +30,10 @@ static uint8_t flame_chance = 0x05;
 static uint8_t flame_width = 0x30;
 static size_t coal_rows = 1;
 static size_t fire_rows = 1;
+#ifndef __EMSCRIPTEN__
 #if CAP_SPEED
 static size_t speed = 30;
+#endif
 #endif
 static size_t width;
 static size_t height;
@@ -253,8 +258,10 @@ static void gameloop(void)
     }
 #endif
 
+#ifndef __EMSCRIPTEN__
 #if CAP_SPEED
     if (heartbeat % speed == 0)
+#endif
 #endif
     {
         make_coals();
@@ -309,6 +316,9 @@ int main(int argc, char *argv[])
 #if PRINT_FPS
     start_time = SDL_GetTicks();
 #endif
+#ifdef __EMSCRIPTEN__
+    emscripten_set_main_loop(gameloop, 0, 1);
+#else
     while (!gameover)
     {
         gameloop();
@@ -316,6 +326,7 @@ int main(int argc, char *argv[])
         SDL_Delay(1);
 #endif
     }
+#endif
 
     SDL_FreeSurface(screen);
     SDL_FreeSurface(surface);

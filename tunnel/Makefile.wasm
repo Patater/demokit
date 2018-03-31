@@ -1,0 +1,19 @@
+LDFLAGS := -s USE_SDL=2 -s WASM=1 -s "BINARYEN_TRAP_MODE='clamp'"
+CFLAGS := -O3 -Werror -Wall -Wextra -pedantic -std=c90
+
+CC := emcc
+
+all: tunnel.html
+
+run: tunnel.html
+	emrun --no_browser --port 8080 $^
+
+OBJS := tunnel.c
+INC :=
+
+tunnel.html: $(OBJS) $(INC)
+	$(CC) $(CFLAGS) $(OBJS) $(LDFLAGS) -o $@
+
+.PHONY: clean
+clean:
+	-rm -f tunnel.html tunnel.js tunnel.wasm

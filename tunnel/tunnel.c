@@ -10,6 +10,9 @@
 #include <SDL2/SDL.h>
 #include <math.h>
 #include <stdlib.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 /* Texture dimensions must be powers of 2 for wrap around to work well. */
 #define TEX_WIDTH 256
@@ -29,8 +32,10 @@ static const float zoom = TEX_HEIGHT * 0.025f;
 static const float x_speed = 1 / 20.0f * 0.25f;
 static const float y_speed = 1 / 30.0f * 0.25f;
 
+#ifndef __EMSCRIPTEN__
 #if CAP_SPEED
 static size_t speed = 30;
+#endif
 #endif
 
 static size_t width;
@@ -264,8 +269,10 @@ static void gameloop(void)
     }
 #endif
 
+#ifndef __EMSCRIPTEN__
 #if CAP_SPEED
     if (heartbeat % speed == 0)
+#endif
 #endif
     {
         render(frames);
@@ -309,6 +316,9 @@ int main(int argc, char *argv[]) {
 #if PRINT_FPS
     start_time = SDL_GetTicks();
 #endif
+#ifdef __EMSCRIPTEN__
+    emscripten_set_main_loop(gameloop, 0, 1);
+#else
     while (!gameover)
     {
         gameloop();
@@ -316,6 +326,7 @@ int main(int argc, char *argv[]) {
         SDL_Delay(1);
 #endif
     }
+#endif
 
     SDL_FreeSurface(screen);
     SDL_FreeSurface(surface);

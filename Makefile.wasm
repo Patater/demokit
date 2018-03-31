@@ -1,0 +1,11 @@
+all:
+	$(MAKE) -C fire -f Makefile.wasm
+	$(MAKE) -C plasma -f Makefile.wasm
+	$(MAKE) -C stars -f Makefile.wasm
+	$(MAKE) -C tunnel -f Makefile.wasm
+
+clean:
+	$(MAKE) -C fire -f Makefile.wasm clean
+	$(MAKE) -C plasma -f Makefile.wasm clean
+	$(MAKE) -C stars -f Makefile.wasm clean
+	$(MAKE) -C tunnel -f Makefile.wasm clean

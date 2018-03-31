@@ -10,6 +10,9 @@
 #include <SDL2/SDL.h>
 #include <math.h>
 #include <stdlib.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #define NUM_STARS 1024
 #define ERASE_OLD_STARS 1
@@ -26,8 +29,10 @@ static const float star_speed = 0.025f;
 static const float z_start = -8.0f;
 static const float r_range = 100000.0f;
 
+#ifndef __EMSCRIPTEN__
 #if CAP_SPEED
 static size_t speed = 30;
+#endif
 #endif
 
 static size_t width;
@@ -230,8 +235,10 @@ static void gameloop(void)
     }
 #endif
 
+#ifndef __EMSCRIPTEN__
 #if CAP_SPEED
     if (heartbeat % speed == 0)
+#endif
 #endif
     {
         render_stars();
@@ -280,6 +287,9 @@ int main(int argc, char *argv[])
 #if PRINT_FPS
     start_time = SDL_GetTicks();
 #endif
+#ifdef __EMSCRIPTEN__
+    emscripten_set_main_loop(gameloop, 0, 1);
+#else
     while (!gameover)
     {
         gameloop();
@@ -287,6 +297,7 @@ int main(int argc, char *argv[])
         SDL_Delay(1);
 #endif
     }
+#endif
 
     SDL_FreeSurface(screen);
     SDL_FreeSurface(surface);

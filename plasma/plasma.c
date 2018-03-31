@@ -11,14 +11,19 @@
 #include <SDL2/SDL.h>
 #include <math.h>
 #include <stdlib.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #define CAP_SPEED 1
 #define WIDTH 320
 #define HEIGHT 240
 #define PRINT_FPS 0
 
+#ifndef __EMSCRIPTEN__
 #if CAP_SPEED
 static size_t speed = 30;
+#endif
 #endif
 
 static size_t width;
@@ -141,8 +146,10 @@ static void gameloop(void)
     }
 #endif
 
+#ifndef __EMSCRIPTEN__
 #if CAP_SPEED
     if (heartbeat % speed == 0)
+#endif
 #endif
     {
         rotate_palette();
@@ -190,6 +197,9 @@ int main(int argc, char *argv[])
 #if PRINT_FPS
     start_time = SDL_GetTicks();
 #endif
+#ifdef __EMSCRIPTEN__
+    emscripten_set_main_loop(gameloop, 0, 1);
+#else
     while (!gameover)
     {
         gameloop();
@@ -197,6 +207,7 @@ int main(int argc, char *argv[])
         SDL_Delay(1);
 #endif
     }
+#endif
 
     SDL_FreeSurface(screen);
     SDL_FreeSurface(surface);
