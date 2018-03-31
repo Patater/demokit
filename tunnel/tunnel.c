@@ -40,7 +40,7 @@ static SDL_Surface *screen;
 static SDL_Surface *surface;
 static SDL_Color palette[256];
 static size_t texture[TEX_WIDTH * TEX_HEIGHT];
-static size_t *angle_table;
+static int *angle_table;
 static size_t *distance_table;
 static uint8_t *pixels;
 static int gameover = 0;
@@ -79,14 +79,20 @@ static void create_transforms(void)
     {
         for (x = 0; x < width * 2; x++)
         {
-            size_t angle;
+            int angle;
+            double angle_prescale;
             size_t distance;
+            double dist_prescale;
             static const double ratio = 32.0;
 
-            angle = 0.5 * TEX_WIDTH
-                    * atan2((float)y - height, (float)x - width) / M_PI;
-            distance = (size_t)(ratio * TEX_HEIGHT / dist(x, y, width, height))
-                       % TEX_HEIGHT;
+            angle_prescale = atan2((double)y - height, (double)x - width);
+            angle = 0.5 * TEX_WIDTH * angle_prescale / M_PI;
+
+            dist_prescale = dist(x, y, width, height);
+            distance = dist_prescale ?
+                           (size_t)(ratio * TEX_HEIGHT /
+                               dist_prescale) % TEX_HEIGHT
+                           : 0;
 
             angle_table[y * width * 2 + x] = angle;
             distance_table[y * width * 2 + x] = distance;

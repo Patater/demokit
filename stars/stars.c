@@ -95,10 +95,14 @@ static void render_stars(void)
         size_t y;
         float widthf = width;
         float heightf = height;
+        float x_pre;
+        float y_pre;
 
         /* Old position */
-        x = stars[i].x / stars[i].z + widthf / 2.0f;
-        y = stars[i].y / stars[i].z + heightf / 2.0f;
+        x_pre = stars[i].x / stars[i].z + widthf / 2.0f;
+        x = x_pre >= 0.0f ? x_pre : width; /* Draw off screen if negative. */
+        y_pre = stars[i].y / stars[i].z + heightf / 2.0f;
+        y = y_pre >= 0.0f ? y_pre : height; /* Draw off screen if negative. */
 
         /* If star is out of sight: */
         if (clip_pixel(x, y))
@@ -117,8 +121,10 @@ static void render_stars(void)
         stars[i].z += star_speed;
 
         /* New position */
-        x = stars[i].x / stars[i].z + widthf / 2.0f;
-        y = stars[i].y / stars[i].z + heightf / 2.0f;
+        x_pre = stars[i].x / stars[i].z + widthf / 2.0f;
+        x = x_pre >= 0.0f ? x_pre : width; /* Draw off screen if negative. */
+        y_pre = stars[i].y / stars[i].z + heightf / 2.0f;
+        y = y_pre >= 0.0f ? y_pre : height; /* Draw off screen if negative. */
 
         /* If star is out of sight: */
         if (clip_pixel(x, y))

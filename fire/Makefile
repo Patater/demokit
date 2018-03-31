@@ -9,6 +9,7 @@ CFLAGS := -O3 -Werror -Wall -Wextra -pedantic -std=c90 -g
 
 # CFLAGS += -Wno-switch
 CFLAGS += -Wno-overlength-strings
+CFLAGS += -fsanitize=undefined -fno-sanitize-recover=undefined
 
 all: fire
 
