@@ -9,7 +9,6 @@
 
 #include "plasmpal.h"
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
 #include <math.h>
 #include <stdlib.h>
 
