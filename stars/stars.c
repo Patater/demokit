@@ -32,10 +32,12 @@ static size_t speed = 30;
 
 static size_t width;
 static size_t height;
+static SDL_Window *window;
 static SDL_Surface *screen;
 static SDL_Surface *surface;
 static SDL_Color star_palette[256];
 static uint8_t *pixels;
+static int gameover = 0;
 
 struct star {
     float x;
@@ -168,15 +170,85 @@ static void create_surface(void)
     SDL_BlitSurface(surface, NULL, screen, NULL);
 }
 
-int main(int argc, char *argv[]) {
+static void gameloop(void)
+{
     static size_t heartbeat = 0;
+    SDL_Event event;
+    if (SDL_PollEvent(&event))
+    {
+        if (event.type == SDL_QUIT)
+        {
+            gameover = 1;
+        }
+        else if (event.type == SDL_WINDOWEVENT)
+        {
+            switch (event.window.event)
+            {
+                case SDL_WINDOWEVENT_RESIZED:
+                case SDL_WINDOWEVENT_SIZE_CHANGED:
+                    width = event.window.data1;
+                    height = event.window.data2;
+
+                    SDL_FreeSurface(screen);
+                    screen = SDL_GetWindowSurface(window);
+
+                    SDL_FreeSurface(surface);
+                    create_surface();
+
+                    init_stars();
+
+                    break;
+                default:
+                    break;
+            }
+        }
+        else if (event.type == SDL_KEYDOWN)
+        {
+            switch (event.key.keysym.sym)
+            {
+                case SDLK_ESCAPE:
+                    gameover = 1;
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+
+#if PRINT_FPS
+    if (heartbeat % 1000 == 0)
+    {
+        float fps = (frames / (float)(SDL_GetTicks() - start_time)) * 1000;
+        printf("FPS: %f\n", fps);
+    }
+#endif
+
+#if CAP_SPEED
+    if (heartbeat % speed == 0)
+#endif
+    {
+        render_stars();
+
+        /* Copy the surface to the screen, which transforms from 256-color
+         * indexed to whatever the screen actually is. */
+        SDL_BlitSurface(surface, NULL, screen, NULL);
+
+        SDL_UpdateWindowSurface(window);
+#if PRINT_FPS
+        ++frames;
+#endif
+    }
+
+    ++heartbeat;
+}
+
+int main(int argc, char *argv[])
+{
 #if PRINT_FPS
     static size_t frames = 0;
     Uint32 start_time;
 #endif
-    SDL_Event event;
-    SDL_Window *window;
-    int gameover = 0;
 
     (void)argc;
     (void)argv;
@@ -204,73 +276,7 @@ int main(int argc, char *argv[]) {
 #endif
     while (!gameover)
     {
-        if (SDL_PollEvent(&event))
-        {
-            if (event.type == SDL_QUIT)
-            {
-                gameover = 1;
-            }
-            else if (event.type == SDL_WINDOWEVENT)
-            {
-                switch (event.window.event)
-                {
-                    case SDL_WINDOWEVENT_RESIZED:
-                    case SDL_WINDOWEVENT_SIZE_CHANGED:
-                        width = event.window.data1;
-                        height = event.window.data2;
-
-                        SDL_FreeSurface(screen);
-                        screen = SDL_GetWindowSurface(window);
-
-                        SDL_FreeSurface(surface);
-                        create_surface();
-
-                        init_stars();
-
-                        break;
-                    default:
-                        break;
-                }
-            }
-            else if (event.type == SDL_KEYDOWN)
-            {
-                switch (event.key.keysym.sym)
-                {
-                    case SDLK_ESCAPE:
-                        gameover = 1;
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-        }
-
-#if PRINT_FPS
-        if (heartbeat % 1000 == 0)
-        {
-            float fps = (frames / (float)(SDL_GetTicks() - start_time)) * 1000;
-            printf("FPS: %f\n", fps);
-        }
-#endif
-
-#if CAP_SPEED
-        if (heartbeat % speed == 0)
-#endif
-        {
-            render_stars();
-
-            /* Copy the surface to the screen, which transforms from 256-color
-             * indexed to whatever the screen actually is. */
-            SDL_BlitSurface(surface, NULL, screen, NULL);
-
-            SDL_UpdateWindowSurface(window);
-#if PRINT_FPS
-            ++frames;
-#endif
-        }
-
-        ++heartbeat;
+        gameloop();
 #if CAP_SPEED
         SDL_Delay(1);
 #endif

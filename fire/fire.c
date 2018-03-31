@@ -32,12 +32,14 @@ static size_t speed = 30;
 #endif
 static size_t width;
 static size_t height;
+static SDL_Window *window;
 static SDL_Surface *screen;
 static SDL_Surface *surface;
 static uint8_t *pixels;
 #if !SHOW_COALS
 static size_t offset = 16;
 #endif
+static int gameover = 0;
 
 
 void print_info()
@@ -149,16 +151,142 @@ void make_flames(void)
     }
 }
 
-int main(int argc, char *argv[]) {
-    static size_t heartbeat = 0;
+static void gameloop(void)
+{
 #if PRINT_FPS
     static size_t frames = 0;
     Uint32 start_time;
 #endif
+    static size_t heartbeat = 0;
     SDL_Event event;
-    SDL_Window *window;
-    int gameover = 0;
 
+    if (SDL_PollEvent(&event))
+    {
+        if (event.type == SDL_QUIT)
+        {
+            gameover = 1;
+        }
+        else if (event.type == SDL_WINDOWEVENT)
+        {
+            switch (event.window.event)
+            {
+                case SDL_WINDOWEVENT_RESIZED:
+                case SDL_WINDOWEVENT_SIZE_CHANGED:
+                    width = event.window.data1;
+                    height = event.window.data2;
+
+                    SDL_FreeSurface(screen);
+                    screen = SDL_GetWindowSurface(window);
+
+                    SDL_FreeSurface(surface);
+                    create_surface();
+
+                    break;
+                default:
+                    break;
+            }
+        }
+        else if (event.type == SDL_KEYDOWN)
+        {
+            switch (event.key.keysym.sym)
+            {
+                case SDLK_ESCAPE:
+                    gameover = 1;
+                    break;
+                case SDLK_UP:
+                    ++coal_range;
+                    break;
+                case SDLK_DOWN:
+                    --coal_range;
+                    break;
+                case SDLK_LEFT:
+                    --coal_base;
+                    break;
+                case SDLK_RIGHT:
+                    ++coal_base;
+                    break;
+
+                case SDLK_INSERT:
+                    ++flame_width;
+                    break;
+                case SDLK_DELETE:
+                    --flame_width;
+                    break;
+                case SDLK_HOME:
+                    break;
+                case SDLK_END:
+                    break;
+                case SDLK_PAGEUP:
+                    ++flame_chance;
+                    break;
+                case SDLK_PAGEDOWN:
+                    --flame_chance;
+                    break;
+
+                case SDLK_KP_8:
+                    ++flame_range;
+                    break;
+                case SDLK_KP_5:
+                case SDLK_KP_2: /* fallthrough */
+                    --flame_range;
+                    break;
+                case SDLK_KP_4:
+                    --flame_base;
+                    break;
+                case SDLK_KP_6:
+                    ++flame_base;
+                    break;
+
+                default:
+                    break;
+            }
+
+            print_info();
+        }
+    }
+
+#if PRINT_FPS
+    if (heartbeat % 1000 == 0)
+    {
+        float fps = (frames / (float)(SDL_GetTicks() - start_time)) * 1000;
+        printf("FPS: %f\n", fps);
+    }
+#endif
+
+#if CAP_SPEED
+    if (heartbeat % speed == 0)
+#endif
+    {
+        make_coals();
+        make_flames();
+        {
+#if SHOW_COALS
+        SDL_BlitSurface(surface, NULL, screen, NULL);
+#else
+        SDL_Rect dstrect;
+        SDL_Rect srcrect;
+        srcrect.x = 0;
+        srcrect.y = 0;
+        srcrect.w = width;
+        srcrect.h = height - offset;
+        dstrect.x = 0;
+        dstrect.y = offset;
+        dstrect.w = width;
+        dstrect.h = height - offset;
+        SDL_BlitSurface(surface, &srcrect, screen, &dstrect);
+#endif
+        SDL_UpdateWindowSurface(window);
+        }
+#if PRINT_FPS
+        ++frames;
+#endif
+    }
+
+    ++heartbeat;
+}
+
+int main(int argc, char *argv[])
+{
     (void)argc;
     (void)argv;
 
@@ -183,129 +311,7 @@ int main(int argc, char *argv[]) {
 #endif
     while (!gameover)
     {
-        if (SDL_PollEvent(&event))
-        {
-            if (event.type == SDL_QUIT)
-            {
-                gameover = 1;
-            }
-            else if (event.type == SDL_WINDOWEVENT)
-            {
-                switch (event.window.event)
-                {
-                    case SDL_WINDOWEVENT_RESIZED:
-                    case SDL_WINDOWEVENT_SIZE_CHANGED:
-                        width = event.window.data1;
-                        height = event.window.data2;
-
-                        SDL_FreeSurface(screen);
-                        screen = SDL_GetWindowSurface(window);
-
-                        SDL_FreeSurface(surface);
-                        create_surface();
-
-                        break;
-                    default:
-                        break;
-                }
-            }
-            else if (event.type == SDL_KEYDOWN)
-            {
-                switch (event.key.keysym.sym)
-                {
-                    case SDLK_ESCAPE:
-                        gameover = 1;
-                        break;
-                    case SDLK_UP:
-                        ++coal_range;
-                        break;
-                    case SDLK_DOWN:
-                        --coal_range;
-                        break;
-                    case SDLK_LEFT:
-                        --coal_base;
-                        break;
-                    case SDLK_RIGHT:
-                        ++coal_base;
-                        break;
-
-                    case SDLK_INSERT:
-                        ++flame_width;
-                        break;
-                    case SDLK_DELETE:
-                        --flame_width;
-                        break;
-                    case SDLK_HOME:
-                        break;
-                    case SDLK_END:
-                        break;
-                    case SDLK_PAGEUP:
-                        ++flame_chance;
-                        break;
-                    case SDLK_PAGEDOWN:
-                        --flame_chance;
-                        break;
-
-                    case SDLK_KP_8:
-                        ++flame_range;
-                        break;
-                    case SDLK_KP_5:
-                    case SDLK_KP_2: /* fallthrough */
-                        --flame_range;
-                        break;
-                    case SDLK_KP_4:
-                        --flame_base;
-                        break;
-                    case SDLK_KP_6:
-                        ++flame_base;
-                        break;
-
-                    default:
-                        break;
-                }
-
-                print_info();
-            }
-        }
-
-#if PRINT_FPS
-        if (heartbeat % 1000 == 0)
-        {
-            float fps = (frames / (float)(SDL_GetTicks() - start_time)) * 1000;
-            printf("FPS: %f\n", fps);
-        }
-#endif
-
-#if CAP_SPEED
-        if (heartbeat % speed == 0)
-#endif
-        {
-            make_coals();
-            make_flames();
-            {
-#if SHOW_COALS
-            SDL_BlitSurface(surface, NULL, screen, NULL);
-#else
-            SDL_Rect dstrect;
-            SDL_Rect srcrect;
-            srcrect.x = 0;
-            srcrect.y = 0;
-            srcrect.w = width;
-            srcrect.h = height - offset;
-            dstrect.x = 0;
-            dstrect.y = offset;
-            dstrect.w = width;
-            dstrect.h = height - offset;
-            SDL_BlitSurface(surface, &srcrect, screen, &dstrect);
-#endif
-            SDL_UpdateWindowSurface(window);
-            }
-#if PRINT_FPS
-            ++frames;
-#endif
-        }
-
-        ++heartbeat;
+        gameloop();
 #if CAP_SPEED
         SDL_Delay(1);
 #endif
