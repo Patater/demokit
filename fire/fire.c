@@ -8,7 +8,7 @@
  */
 
 #include "firepal.h"
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <stdlib.h>
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>

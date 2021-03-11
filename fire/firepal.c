@@ -8,7 +8,7 @@
  */
 
 #include "firepal.h"
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 SDL_Color fire_palette[256] = {
     { 0x00, 0x00, 0x00, 0xFF},

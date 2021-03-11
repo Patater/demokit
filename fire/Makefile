@@ -2,10 +2,9 @@ LDFLAGS := -lSDL2
 CFLAGS := -O3 -Werror -Wall -Wextra -pedantic -std=c90 -g
 #CFLAGS := -O3 -Werror -Wall -Wextra -pedantic -std=c90
 
-#CFLAGS += $(shell sdl-config --cflags)
-#LIBS += $(shell sdl-config --libs)
-
-#CFLAGS += $(LIBS)
+CFLAGS += $(shell sdl2-config --cflags)
+LIBS += $(shell sdl2-config --libs)
+CFLAGS += $(LIBS)
 
 # CFLAGS += -Wno-switch
 CFLAGS += -Wno-overlength-strings

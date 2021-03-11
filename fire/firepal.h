@@ -10,7 +10,7 @@
 #ifndef FIREPAL_H
 #define FIREPAL_H
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 extern SDL_Color fire_palette[256];
 
