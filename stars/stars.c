@@ -7,7 +7,7 @@
  *
  */
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <math.h>
 #include <stdlib.h>
 #ifdef __EMSCRIPTEN__
