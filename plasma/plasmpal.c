@@ -8,7 +8,7 @@
  */
 
 #include "plasmpal.h"
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 SDL_Color plasma_palette[256] = {
     { 0x00, 0x02, 0xFD, 0xFF},

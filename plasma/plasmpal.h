@@ -10,7 +10,7 @@
 #ifndef PLASMPAL_H
 #define PLASMPAL_H
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 extern SDL_Color plasma_palette[256];
 
