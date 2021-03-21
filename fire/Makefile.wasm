@@ -1,4 +1,4 @@
-LDFLAGS := -s USE_SDL=2 -s WASM=1 -s "BINARYEN_TRAP_MODE='clamp'"
+LDFLAGS := -s USE_SDL=2 -s WASM=1
 CFLAGS := -O3 -Werror -Wall -Wextra -pedantic -std=c90
 
 CC := emcc
