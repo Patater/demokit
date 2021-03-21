@@ -56,15 +56,15 @@ struct star stars[NUM_STARS];
 static void init_star(struct star *star)
 {
     /* Make a disc of stars. */
-    const float t = ((float)rand() / RAND_MAX) * (2.0f * M_PI);
-    const float r = r_range * ((float)rand() / RAND_MAX);
+    const float t = ((float)rand() / (float)RAND_MAX) * (2.0f * M_PI);
+    const float r = r_range * ((float)rand() / (float)RAND_MAX);
     star->x = r * cos(t);                 /* [-r_range, r_range] */
     star->y = r * sin(t);                 /* [-r_range, r_range] */
     star->z = z_start;
 
 
     /* [0, 255] */
-    star->initial_color = (1.0f - ((float)rand() / RAND_MAX) * 0.75f) * 255.0f;
+    star->initial_color = (1.0f - ((float)rand() / (float)RAND_MAX) * 0.75f) * 255.0f;
     star->initial_color = star->initial_color > 255 ? 255
                                                     : star->initial_color;
 }
