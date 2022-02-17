@@ -1,0 +1,56 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@master
+
+      - name: Install build environment
+        run: |
+            sudo apt-get update
+            sudo apt-get install libsdl2-dev
+            git clone https://github.com/emscripten-core/emsdk.git
+            pushd emsdk
+            ./emsdk install latest
+            ./emsdk activate latest
+            source ./emsdk_env.sh
+            popd
+            echo -n "CC: "; cc --version
+            echo -n "emcc: "; emcc --version
+            echo -n "sdl2: "; sdl2-config --version
+
+      - name: Build native
+        run: |
+            make
+            make clean
+
+      - name: Build wasm
+        run: |
+            source ./emsdk/emsdk_env.sh
+            make -f Makefile.wasm
+
+      - name: Deploy wasm
+        run: |
+            git config user.name "Jaeden Amero"
+            git config user.email "jaeden@patater.com"
+            touch .nojekyll
+            git add .nojekyll
+            mv fire/fire.html fire/index.html
+            mv plasma/plasma.html plasma/index.html
+            mv stars/stars.html stars/index.html
+            mv tunnel/tunnel.html tunnel/index.html
+            git add -f fire/index.html fire/fire.js fire/fire.wasm
+            git add -f plasma/index.html plasma/plasma.js plasma/plasma.wasm
+            git add -f stars/index.html stars/stars.js stars/stars.wasm
+            git add -f tunnel/index.html tunnel/tunnel.js tunnel/tunnel.wasm
+            git commit -am "Deploy wasm pages"
+            git push -f origin HEAD:refs/heads/gh-pages
