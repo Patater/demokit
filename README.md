@@ -14,7 +14,7 @@ If you just want to see what each demo does, they have all been built into
 
 Click any of the images below to see the effect in action.
 
-[![Fire](images/Fire.png "Fire")](https://patater.com/demokit/fire/)
-[![Plasma](images/Plasma.png "Plasma")](https://patater.com/demokit/plasma/)
-[![Stars](images/Stars.png "Stars")](https://patater.com/demokit/stars/)
-[![Tunnel](images/Tunnel.png "Tunnel")](https://patater.com/demokit/tunnel/)
+[![Fire](images/Fire.png "Fire")](https://www.patater.com/demokit/fire/)
+[![Plasma](images/Plasma.png "Plasma")](https://www.patater.com/demokit/plasma/)
+[![Stars](images/Stars.png "Stars")](https://www.patater.com/demokit/stars/)
+[![Tunnel](images/Tunnel.png "Tunnel")](https://www.patater.com/demokit/tunnel/)
