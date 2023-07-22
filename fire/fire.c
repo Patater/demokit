@@ -47,7 +47,7 @@ static size_t offset = 16;
 static int gameover = 0;
 
 
-void print_info()
+void print_info(void)
 {
     printf("coal_range: 0x%02X\n", coal_range);
     printf("coal_base: 0x%02X\n", coal_base);
