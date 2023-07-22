@@ -20,6 +20,7 @@
 #define SHOW_COALS 0
 #define WIDTH 320
 #define HEIGHT 240
+#define NEED_HEARTBEAT (PRINT_FPS || (CAP_SPEED && !__EMSCRIPTEN__))
 
 
 static uint8_t coal_range = 0x10;
@@ -162,7 +163,9 @@ static void gameloop(void)
     static size_t frames = 0;
     Uint32 start_time;
 #endif
+#if NEED_HEARTBEAT
     static size_t heartbeat = 0;
+#endif
     SDL_Event event;
 
     if (SDL_PollEvent(&event))
@@ -289,7 +292,9 @@ static void gameloop(void)
 #endif
     }
 
+#if NEED_HEARTBEAT
     ++heartbeat;
+#endif
 }
 
 int main(int argc, char *argv[])

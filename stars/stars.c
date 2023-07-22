@@ -20,6 +20,7 @@
 #define WIDTH 320
 #define HEIGHT 240
 #define PRINT_FPS 0
+#define NEED_HEARTBEAT (PRINT_FPS || (CAP_SPEED && !__EMSCRIPTEN__))
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -183,7 +184,9 @@ static void create_surface(void)
 
 static void gameloop(void)
 {
+#if NEED_HEARTBEAT
     static size_t heartbeat = 0;
+#endif
     SDL_Event event;
     if (SDL_PollEvent(&event))
     {
@@ -253,7 +256,9 @@ static void gameloop(void)
 #endif
     }
 
+#if NEED_HEARTBEAT
     ++heartbeat;
+#endif
 }
 
 int main(int argc, char *argv[])

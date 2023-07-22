@@ -19,6 +19,7 @@
 #define WIDTH 320
 #define HEIGHT 240
 #define PRINT_FPS 0
+#define NEED_HEARTBEAT (PRINT_FPS || (CAP_SPEED && !__EMSCRIPTEN__))
 
 #ifndef __EMSCRIPTEN__
 #if CAP_SPEED
@@ -94,7 +95,9 @@ static void initialize_plasma(void)
 
 static void gameloop(void)
 {
+#if NEED_HEARTBEAT
     static size_t heartbeat = 0;
+#endif
     SDL_Event event;
     if (SDL_PollEvent(&event))
     {
@@ -165,7 +168,9 @@ static void gameloop(void)
 #endif
     }
 
+#if NEED_HEARTBEAT
     ++heartbeat;
+#endif
 }
 
 int main(int argc, char *argv[])
